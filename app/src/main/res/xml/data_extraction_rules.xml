@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Reglas de backup en la nube: se restringirán al integrar Room con datos sensibles. -->
+    </cloud-backup>
+    <device-transfer>
+        <!-- Reglas de transferencia entre dispositivos. -->
+    </device-transfer>
+</data-extraction-rules>

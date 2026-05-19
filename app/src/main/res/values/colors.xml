@@ -1,0 +1,5 @@
+<resources>
+    <!-- Azul institucional IPVG (alineado a ui/theme Color.kt) -->
+    <color name="ic_launcher_background">#002D72</color>
+    <color name="splash_background">#FFFFFF</color>
+</resources>

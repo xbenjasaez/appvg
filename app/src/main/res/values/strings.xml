@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">Docente Calma</string>
+
+    <!-- Pantalla: efectividad del piloto -->
+    <string name="pilot_effectiveness_title">Efectividad del piloto</string>
+    <string name="pilot_effectiveness_subtitle">Vista personal; datos solo en este dispositivo</string>
+    <string name="pilot_effectiveness_intro">La efectividad aquí significa si tus propios registros muestran cambios útiles en el autoinforme breve, continuidad razonable, avance en micromódulos y, si respondiste, una percepción favorable. No es un diagnóstico ni un juicio sobre tu desempeño.</string>
+    <string name="pilot_effectiveness_intro_short">¿La app te está ayudando? Esta pantalla cruza tu autoinforme breve (carga y regulación percibida en la última semana), micromódulos, días con uso reciente y la encuesta corta opcional. Todo queda en tu equipo; no sustituye evaluaciones institucionales.</string>
+
+    <string name="pilot_section_interpretation">Lectura para ti</string>
+    <string name="pilot_section_kpis">Señales concretas</string>
+    <string name="pilot_section_dimensions">Autoinforme por dimensiones</string>
+    <string name="pilot_section_dimensions_hint">Misma escala que en la autoevaluación (1 = casi nunca … 5 = muy a menudo). Si un número baja, suele indicar menos tensión o carga autoinformada en esa dimensión.</string>
+    <string name="pilot_section_know">Qué sí podemos decir con lo guardado aquí</string>
+    <string name="pilot_section_unknown">Qué no podemos concluir todavía</string>
+    <string name="pilot_section_next">Próximos pasos sugeridos</string>
+    <string name="pilot_section_institutional">Fuera de esta app</string>
+    <string name="pilot_institutional_body">Indicadores como incidentes o la dimensión relacional del SEID dependen de registros del establecimiento y del tiempo. No se miden dentro de Docente Calma. Si tu centro trabaja esos datos, el seguimiento será aparte de esta vista.</string>
+
+    <string name="pilot_kpi_prepost_title">Autoinforme pre / post</string>
+    <string name="pilot_kpi_prepost_need_second">Hoy tienes una sola lectura. La comparación en el tiempo aparece cuando completes una segunda autoevaluación en Autoevaluación.</string>
+    <string name="pilot_kpi_prepost_pair">Línea base (primera lectura): %1$d/%4$d · Última lectura: %2$d/%4$d. Cambio relativo respecto de la línea base: %3$d%%. En esta escala, un valor total más bajo suele indicar menos carga o tensión autoinformada.</string>
+    <string name="pilot_kpi_prepost_no_assessment">Aún no hay autoevaluaciones guardadas. Sin esa línea base, no podemos hablar de “antes y después” en el autoinforme.</string>
+
+    <string name="pilot_kpi_modules_title">Micromódulos completados</string>
+    <string name="pilot_kpi_modules_fmt">%1$d de %2$d (%3$d%%). Completar lecturas clave apoya el piloto; no es la única forma de uso útil.</string>
+
+    <string name="pilot_kpi_continuity_title">Continuidad reciente (14 días)</string>
+    <string name="pilot_kpi_continuity_fmt">%1$d días distintos con actividad registrada en la app (ventana móvil de dos semanas). Sirve como adherencia aproximada, no como “minutos de calidad”.</string>
+
+    <string name="pilot_kpi_feedback_title">Encuesta breve “¿Te está sirviendo?”</string>
+    <string name="pilot_kpi_feedback_present">Satisfacción %1$d/5 · Utilidad percibida %2$d/5 · Facilidad %3$d/5 (autoinforme opcional).</string>
+    <string name="pilot_kpi_feedback_absent">Aún no hay respuesta guardada. Si aparece el aviso en inicio, puedes contestar en un minuto; es voluntario.</string>
+
+    <string name="pilot_dim_line">%1$s: %2$d → %3$d (%4$s)</string>
+    <string name="pilot_dim_delta_down">mejor autoinforme en esta dimensión</string>
+    <string name="pilot_dim_delta_same">sin cambio claro</string>
+    <string name="pilot_dim_delta_up">más tensión o carga autoinformada</string>
+
+    <string name="pilot_technical_expand">Detalle técnico de actividad (opcional)</string>
+    <string name="pilot_technical_hint">Conteos anónimos guardados en el dispositivo. Útiles para coordinar la prueba; por sí solos no miden si la app fue efectiva para ti.</string>
+
+    <string name="pilot_privacy_card_title">Privacidad y alcance</string>
+    <string name="pilot_privacy_b1">Todo lo que ves aquí se calcula en el teléfono o tablet; no hay panel institucional automático.</string>
+    <string name="pilot_privacy_b2">Los conteos técnicos no incluyen el texto del chat ni notas personales.</string>
+    <string name="pilot_privacy_b3">Puedes borrar historial desde Privacidad; las métricas locales del piloto se conservan salvo que se limpien por separado.</string>
+
+    <!-- Veredictos: título + párrafo -->
+    <string name="pilot_verdict_insufficient_title">Insuficiente evidencia por ahora</string>
+    <string name="pilot_verdict_insufficient_body">Hay muy pocos registros para interpretar con criterio. Esto no significa que vaya mal: solo que aún no se puede caracterizar el piloto en tu caso.</string>
+
+    <string name="pilot_verdict_awaiting_second_title">Falta una segunda autoevaluación</string>
+    <string name="pilot_verdict_awaiting_second_body">Tienes una lectura del autoinforme breve, pero sin otra fecha de referencia no podemos describir cambio en el tiempo. El uso de la app puede ser útil aunque aún no haya “antes y después”.</string>
+
+    <string name="pilot_verdict_usage_no_self_title">Uso registrado, sin trayectoria de autoinforme</string>
+    <string name="pilot_verdict_usage_no_self_body">Hay actividad en el dispositivo, pero no hay autoevaluaciones guardadas. Sin esa línea base personal no podemos vincular el uso a un cambio en cómo percibes carga o tensión.</string>
+
+    <string name="pilot_verdict_usage_no_shift_title">Uso sostenido, sin cambio claro en el autoinforme</string>
+    <string name="pilot_verdict_usage_no_shift_body">Registras varios días de actividad reciente y al menos dos autoevaluaciones, pero la suma no baja de forma clara según los umbrales del piloto. Puede haber beneficios no capturados aquí, o hace falta más tiempo o hábitos distintos dentro de la app.</string>
+
+    <string name="pilot_verdict_positive_title">Señales iniciales positivas</string>
+    <string name="pilot_verdict_positive_body">Hay una bajada clara en la suma del autoinforme respecto de tu línea base, junto con satisfacción y utilidad altas en la encuesta breve y varios días de uso reciente. Es evidencia inicial y autoinformada, no un resultado institucional cerrado.</string>
+
+    <string name="pilot_verdict_mixed_title">Señales mixtas</string>
+    <string name="pilot_verdict_mixed_body">El autoinforme muestra un cambio favorable, pero la encuesta breve no acompaña en satisfacción o utilidad (o a la inversa). Conviene revisar qué partes de la app te resultan útiles y cuáles no.</string>
+
+    <string name="pilot_verdict_incomplete_title">Cambio favorable; lectura incompleta</string>
+    <string name="pilot_verdict_incomplete_body">La suma del autoinforme mejoró de forma clara, pero falta la encuesta breve o la continuidad reciente no es tan sostenida. Es una señal alentadora, aún no un panorama completo.</string>
+
+    <string name="pilot_verdict_small_title">Cambio pequeño o estable</string>
+    <string name="pilot_verdict_small_body">Hay dos o más lecturas, pero la diferencia en la suma es modesta. Puede ser estabilidad, variación normal o que haga falta más tiempo para ver un movimiento claro.</string>
+
+    <!-- Próximos pasos (entradas sueltas reutilizables) -->
+    <string name="pilot_next_explore_app">Explora chequeo emocional, micromódulos o apoyo cuando lo necesites.</string>
+    <string name="pilot_next_second_assessment">Completa una segunda autoevaluación cuando puedas; así habrá comparación en el tiempo.</string>
+    <string name="pilot_next_first_assessment">Haz tu primera autoevaluación breve desde la sección Autoevaluación.</string>
+    <string name="pilot_next_feedback">Si te aparece la encuesta en inicio, considera responder; ayuda a matizar la lectura.</string>
+    <string name="pilot_next_modules">Retoma o termina un micromódulo; son lecturas cortas pensadas para el aula.</string>
+    <string name="pilot_next_reflect_mixed">Reflexiona qué herramientas sí te aportan y cuáles podrías dejar de forzar.</string>
+    <string name="pilot_next_keep_habit">Si te está sirviendo, mantén un ritmo breve y sostenible; no hace falta usar todo cada día.</string>
+
+    <string name="pilot_know_usage_local">Qué registraste en este dispositivo (autoinforme, micromódulos, días con actividad, encuesta opcional).</string>
+    <string name="pilot_know_not_clinical">Que estos datos son autoinforme y educativos; no sustituyen evaluación psicológica ni laboral.</string>
+    <string name="pilot_unknown_causality">Si la app causó el cambio o solo acompaña otras estrategias.</string>
+    <string name="pilot_unknown_generalize">Si lo que observas se repetiría en otras personas o contextos.</string>
+    <string name="pilot_unknown_institutional">Resultados institucionales agregados (metas del piloto a nivel IPVG) no se ven aquí.</string>
+
+    <string name="pilot_error_load">No se pudieron leer algunos datos locales. Puedes salir y volver a intentar.</string>
+
+    <!-- Privacidad: entrada desde pantalla Privacidad -->
+    <string name="privacy_pilot_card_title">Efectividad del piloto</string>
+    <string name="privacy_pilot_card_body">Abre una lectura personal sobre si tus registros muestran señales útiles (autoinforme, micromódulos, uso reciente y encuesta opcional). Sigue siendo información solo en este equipo.</string>
+    <string name="privacy_pilot_card_action">Abrir efectividad del piloto…</string>
+</resources>

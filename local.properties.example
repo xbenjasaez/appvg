@@ -1,0 +1,9 @@
+# Copia este archivo como local.properties y completa los valores.
+# local.properties está en .gitignore y NO debe commitearse.
+
+# Ruta al SDK de Android. Android Studio la completa automáticamente al abrir el proyecto.
+# sdk.dir=C:\\Users\\tu_usuario\\AppData\\Local\\Android\\Sdk
+
+# API key de Gemini (Google AI Studio). Dejar vacío si aún no la tienes;
+# el chat de apoyo operará en modo fallback local hasta que se configure.
+GEMINI_API_KEY=
