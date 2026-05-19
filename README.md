@@ -1,398 +1,230 @@
+<div align="center">
+
 # Docente Calma
 
-Aplicación Android nativa de bienestar socioemocional para **docentes part-time** del **Instituto Profesional Virginio Gómez** (en la app: **IP Virginio Gómez**). Permite registrar estados emocionales, recibir recomendaciones inmediatas, consultar orientación para situaciones de aula, acceder a ejercicios breves de regulación y conversar con un chat de apoyo asistido por IA.
+**Bienestar socioemocional para docentes a honorarios del IP Virginio Gómez**
 
-> **Uso personal, privado y offline-first.** Sin login, sin backend propio, sin panel administrativo. Todos los datos viven en el dispositivo.
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Android](https://img.shields.io/badge/Android-API%2026%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com/)
+[![Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.10-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![License](https://img.shields.io/badge/Licencia-IPVG%20(académico)-gray)](#licencia)
 
----
+[Características](#-características) · [Inicio rápido](#-inicio-rápido) · [Arquitectura](#-arquitectura) · [Privacidad](#-privacidad) · [Docs](docs/TECHNICAL_OVERVIEW.md)
 
-## Tabla de contenidos
+</div>
 
-1. [Propósito](#propósito)
-2. [Stack tecnológico](#stack-tecnológico)
-3. [Arquitectura](#arquitectura)
-4. [Estructura de carpetas](#estructura-de-carpetas)
-5. [Módulos principales](#módulos-principales)
-6. [Configuración de la Gemini API](#configuración-de-la-gemini-api)
-7. [Cómo ejecutar](#cómo-ejecutar)
-8. [Testing](#testing)
-9. [Privacidad](#privacidad)
-10. [Limitaciones del MVP](#limitaciones-del-mvp)
-11. [Mejoras futuras](#mejoras-futuras)
+> Aplicación Android **nativa**, **offline-first** y **sin login**. Los datos viven en el dispositivo. Complementa la autoobservación; **no sustituye** atención psicológica profesional.
 
 ---
 
-## Propósito
+## ✨ Características
 
-La app está pensada como herramienta **personal** para docentes a honorarios que trabajan en distintas sedes, con horarios parciales y bajo acompañamiento institucional continuo. Busca ser:
-
-- **Rápida**: chequeo emocional en menos de 15 segundos.
-- **Privada**: no exporta datos ni requiere cuenta.
-- **Práctica**: respuestas concretas y breves, no diagnósticos.
-- **Responsable**: ante señales de crisis, deriva a ayuda profesional.
-
-No reemplaza atención psicológica profesional. Es un complemento de autoobservación y apoyo inmediato.
-
----
-
-## Stack tecnológico
-
-| Capa | Tecnología |
-|---|---|
-| Lenguaje | Kotlin `2.0.21` |
-| UI | Jetpack Compose (BOM `2024.10.01`), Material 3 |
-| Navegación | Navigation Compose `2.8.3` |
-| DI | Hilt `2.52` |
-| Persistencia | Room `2.6.1` + KSP `2.0.21-1.0.28` |
-| Concurrencia | Kotlin Coroutines `1.9.0`, `StateFlow`, `Channel` |
-| IA | Google Generative AI SDK `0.9.0` (Gemini) |
-| Build | AGP `8.6.1`, JDK 17 |
-| Testing | JUnit 4, `kotlinx-coroutines-test` |
-| `compileSdk` / `targetSdk` | 35 |
-| `minSdk` | 26 (Android 8.0) |
+| Módulo | Qué hace |
+|--------|----------|
+| **Chequeo emocional** | Registro en menos de 15 s: emoción, intensidad y nota opcional |
+| **Recomendaciones** | Motor local que sugiere acciones inmediatas según tu estado |
+| **Lecturas breves** | Micromódulos de 3–5 min (feedback, pausas, límites, cierre de jornada…) |
+| **Guía de aula** | Escenarios frecuentes con orientación práctica |
+| **Ejercicios rápidos** | Respiración 4-7-8, grounding, pausa activa y más |
+| **Chat de apoyo** | IA (Gemini) con fallback local y capa de seguridad previa |
+| **Autodiagnóstico** | Cuestionario breve con retroalimentación personalizada |
+| **Historial y progreso** | Chequeos, recomendaciones y sesiones de chat |
+| **Privacidad** | Pantalla dedicada: qué se guarda, qué no y conductos IPVG |
 
 ---
 
-## Arquitectura
-
-**MVVM + Repository + Domain rules**, offline-first, con la capa `ai/` completamente desacoplada.
-
-```
-┌───────────────────────── UI (Compose) ─────────────────────────┐
-│  Screens ──► ViewModels  (uiState: StateFlow, events, effects) │
-└───────────────────┬────────────────────────────────────────────┘
-                    │
-┌───────────────────▼───────────── Domain ──────────────────────┐
-│  models (Emotion, EmotionalCheckIn, Recommendation, …)        │
-│  mappers (entity ↔ domain)                                    │
-│  rules (RecommendationEngine, ProgressCalculator,             │
-│         ClassroomScenarioCatalog, QuickExerciseCatalog,       │
-│         EmotionRuleCatalog)                                   │
-└───────────────────┬──────────────────────────┬────────────────┘
-                    │                          │
-┌───────────────────▼──────────┐  ┌────────────▼──────────────┐
-│  Data                         │  │  AI (decoupled module)     │
-│   local (Room: DAO + Entity)  │  │   SupportChatAi interface  │
-│   repository                  │  │   Gemini + Resilient +     │
-│                               │  │   Fallback + RiskClassifier│
-└───────────────────────────────┘  └────────────────────────────┘
-```
-
-### Reglas aplicadas
-
-- **Una fuente de verdad por ViewModel**: `MutableStateFlow<UiState>` interno, expuesto como `StateFlow` de solo lectura.
-- **Eventos del usuario**: `sealed interface ...Event` con `data object` / `data class`.
-- **Efectos one-shot** (navegación, snackbar): `Channel<Effect>.receiveAsFlow()`.
-- **Sin acceso directo a Room desde Composables**. Toda lectura/escritura pasa por un repositorio.
-- **Sin lógica de negocio en Composables**. Agregados y reglas viven en `domain/rules/`.
-- **La UI nunca conoce la capa `ai/`**. El ViewModel traduce `ChatMessage` ↔ `SupportChatTurn`.
-- **Entities separadas de modelos de dominio**: sin anotaciones Room en `UiState`.
-
----
-
-## Estructura de carpetas
-
-```
-app/src/main/java/cl/ipvg/docentecalma/
-├── DocenteCalmaApplication.kt           @HiltAndroidApp
-├── MainActivity.kt                      Activity única (edge-to-edge)
-│
-├── ui/
-│   ├── DocenteCalmaApp.kt               Composable raíz (theme + NavHost)
-│   ├── theme/                           Theme, Color, Type
-│   ├── components/
-│   │   ├── DocenteCalmaScaffold.kt      Scaffold con TopAppBar + back
-│   │   └── PlaceholderContent.kt
-│   └── screens/
-│       ├── home/                        HomeScreen + VM + UiState + NavActions
-│       ├── emotionalcheckin/
-│       ├── recommendations/
-│       ├── classroomguidance/
-│       ├── quickexercises/
-│       ├── supportchat/
-│       ├── history/
-│       ├── progress/
-│       └── privacy/
-│
-├── navigation/
-│   ├── Routes.kt                        sealed class con pattern + arguments
-│   ├── NavActions.kt                    @Stable, encapsula NavController
-│   └── DocenteCalmaNavHost.kt
-│
-├── data/
-│   ├── di/DatabaseModule.kt             Hilt provisions
-│   ├── local/
-│   │   ├── AppDatabase.kt
-│   │   ├── dao/                         EmotionalCheckInDao, RecommendationHistoryDao,
-│   │   │                                ChatMessageDao
-│   │   └── entity/                      *Entity.kt
-│   └── repository/                      EmotionalRepository, ChatRepository,
-│                                        ClassroomGuidanceRepository,
-│                                        RecommendationHistoryRepository
-│
-├── domain/
-│   ├── model/                           Emotion, EmotionCategory, EmotionalCheckIn,
-│   │                                    ChatMessage, ChatRole, Recommendation,
-│   │                                    RecommendationHistory, RecommendationType,
-│   │                                    ClassroomScenario, QuickExercise,
-│   │                                    SeverityFlag, ChatSessionSummary
-│   ├── mapper/                          *Mapper.kt + EmotionLabels
-│   └── rules/                           RecommendationEngine, ProgressCalculator,
-│                                        EmotionRuleCatalog, QuickExerciseCatalog,
-│                                        ClassroomScenarioCatalog
-│
-├── ai/
-│   ├── AiConfig.kt                      model name, tokens, apiKey (BuildConfig)
-│   ├── AiModule.kt                      Hilt bindings
-│   ├── AiResult.kt                      sealed Success / Error (kind, fromFallback)
-│   ├── SupportChatAi.kt                 interfaz única
-│   ├── SupportChatTurn.kt               tipo propio, sin dependencia de domain
-│   ├── GeminiSupportChatAi.kt           implementación Google Generative AI
-│   ├── FallbackSupportChatAi.kt         responder local por reglas
-│   ├── ResilientSupportChatAi.kt        decora Gemini con fallback automático
-│   ├── RiskCategory.kt
-│   └── RiskClassifier.kt                pre-AI safety (autolesión, terceros, abuso…)
-│
-└── util/
-    └── DateTimeFormatters.kt
-```
-
-Los tests viven en `app/src/test/java/…` reflejando la misma estructura, con un paquete extra `testing/` para fakes (`FakeEmotionalCheckInDao`, `FakeChatMessageDao`, `FakeSupportChatAi`).
-
----
-
-## Módulos principales
-
-### 1. Emotional Check-In (`ui/screens/emotionalcheckin/`)
-
-Registro rápido de un estado emocional.
-
-- **Emociones**: `STRESS`, `ANXIETY`, `ANGUST`, `ANGER`, `SADNESS`, `FRUSTRATION`, `FATIGUE`, `CALM`, `HAPPY`.
-- **Categorías** (`EmotionCategory`):
-  - `DIFFICULT_HIGH_ACTIVATION` (stress, anxiety, angust, anger)
-  - `DIFFICULT_LOW_ENERGY` (sadness, frustration, fatigue)
-  - `REGULATED_POSITIVE` (calm, happy)
-- **Intensidad**: escala 1–5.
-- **Nota opcional** con límite de caracteres (ver `EmotionalCheckInUiState.NOTE_MAX_LENGTH`).
-- Persiste en `EmotionalCheckInEntity` y emite un efecto `Saved(checkInId)` que permite navegar a `Recommendations`.
-
-### 2. Recommendation Engine (`domain/rules/RecommendationEngine.kt`)
-
-Motor **local y determinístico** (sin IA). Recibe emoción + intensidad + categoría y produce una `Recommendation`:
-
-- `title`
-- `shortMessage`
-- `immediateAction`
-- `breathingSuggestion`
-- `whatToAvoid`
-- `optionalPedagogicalTip`
-
-Cada recomendación mostrada se registra en `RecommendationHistoryEntity` vía `RecommendationsViewModel`.
-
-### 3. Classroom Guidance (`ui/screens/classroomguidance/`)
-
-Lista curada de escenarios de aula frecuentes (indisciplina, conflicto entre estudiantes, padres tensos, etc.) con orientación práctica. Catálogo estático en `ClassroomScenarioCatalog`.
-
-### 4. Quick Exercises (`ui/screens/quickexercises/`)
-
-Ejercicios breves con pasos numerados, leídos desde `QuickExerciseCatalog`:
-
-- Respiración 4-7-8
-- Grounding 5-4-3-2-1
-- Pausa activa
-- Reencuadre cognitivo
-- Micro descanso
-
-### 5. Support Chat (`ui/screens/supportchat/` + `ai/`)
-
-Chat de apoyo socioemocional **no clínico**. Flujo:
-
-1. `RiskClassifier` intercepta el mensaje del usuario antes de llegar al modelo.
-2. Si se detecta autolesión, daño a terceros, abuso o crisis aguda → se responde con un mensaje de contención seguro y la línea de emergencias **(llamada 4141 o 600 360 7777 Salud Responde)**, sin pasar por Gemini.
-3. En el resto de casos, `ResilientSupportChatAi` llama a Gemini; si falla (red, sin API key, vacío, safety-blocked), degrada a `FallbackSupportChatAi` (reglas locales) y marca `fromFallback = true` para que la UI lo indique.
-4. Cada turno (USER/MODEL) se persiste en `ChatMessageEntity` con `sessionId`.
-
-### 6. History (`ui/screens/history/`)
-
-Combina tres fuentes reactivas:
-
-- `EmotionalRepository.observeAll()` → lista de chequeos.
-- `RecommendationHistoryRepository.observeAll()` → recomendaciones vistas.
-- `ChatRepository.observeSessionSummaries()` → resumen por sesión de chat.
-
-### 7. Progress (`ui/screens/progress/` + `ProgressCalculator`)
-
-Métricas agregadas **calculadas en la capa domain**, no en Composables:
-
-- Emoción más frecuente
-- Intensidad promedio
-- Total de registros
-- Proporción difíciles vs. positivas/reguladas
-- Resumen semanal (últimos 7 días)
-
----
-
-## Configuración de la Gemini API
-
-La app **no funciona con una API key hardcodeada**. La clave se inyecta vía `BuildConfig` desde `local.properties`.
-
-### Paso a paso
-
-1. Obtén una API key en [Google AI Studio](https://aistudio.google.com/app/apikey).
-2. En la raíz del proyecto, copia `local.properties.example` como `local.properties`:
-
-    ```properties
-    GEMINI_API_KEY=tu_api_key_aqui
-    ```
-
-3. `local.properties` está en `.gitignore`: **nunca lo commitees**.
-4. `app/build.gradle.kts` lee la propiedad y expone `BuildConfig.GEMINI_API_KEY`:
-
-    ```kotlin
-    val geminiApiKey: String = localProps.getProperty("GEMINI_API_KEY", "")
-    buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
-    ```
-
-5. `AiConfig` la consume y `AiModule` decide qué implementación inyectar:
-    - Con key válida → `GeminiSupportChatAi` envuelto en `ResilientSupportChatAi`.
-    - Sin key → directamente `FallbackSupportChatAi`.
-
-### Modelo y parámetros
-
-Definidos en `ai/AiConfig.kt`. Modelo por defecto `gemini-1.5-flash-latest`. El system prompt está en `GeminiSupportChatAi` y refuerza:
-
-- Tono empático, breve, no clínico.
-- Prohibición de diagnósticos.
-- Derivación explícita a profesional en casos graves.
-- Respuestas en español neutro de Chile.
-
----
-
-## Cómo ejecutar
+## 🚀 Inicio rápido
 
 ### Requisitos
 
-- **Android Studio Ladybug (2024.2.1)** o superior.
-- **JDK 17**.
-- SDK Android 35 instalado.
-- Dispositivo físico o emulador con **API 26+**.
+- Android Studio **Ladybug (2024.2.1)** o superior  
+- **JDK 17+** (el JBR de Android Studio sirve)  
+- Android SDK **35**  
+- Emulador o dispositivo con **API 26+**
 
-### Pasos
-
-```bash
-git clone <repo-url>
-cd "IPVG- S. Castro"
-cp local.properties.example local.properties   # y edita GEMINI_API_KEY si tienes
-```
-
-En Android Studio:
-
-1. **File → Open** y selecciona la carpeta raíz.
-2. Esperar a que Gradle sincronice (descarga AGP 8.6.1, Kotlin 2.0.21, KSP, Compose BOM).
-3. **Run ▶** con configuración `app`.
-
-Desde terminal:
+### Clonar y configurar
 
 ```bash
-./gradlew assembleDebug        # build debug
-./gradlew installDebug          # instalar en dispositivo conectado
-./gradlew test                  # tests unitarios JVM
-./gradlew lint                  # análisis estático
+git clone https://github.com/xbenjasaez/appvg.git
+cd appvg
+cp local.properties.example local.properties
+```
+
+Edita `local.properties`:
+
+- `sdk.dir` — Android Studio suele completarlo al abrir el proyecto  
+- `GEMINI_API_KEY` — opcional; sin clave el chat usa **modo fallback local**
+
+> `local.properties` está en `.gitignore`. **No lo subas a Git.**
+
+### Ejecutar
+
+**Android Studio:** abre la carpeta raíz → espera Gradle → **Run ▶** (`app`).
+
+**Terminal** (Windows):
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+.\gradlew.bat assembleDebug
+.\gradlew.bat installDebug   # requiere dispositivo o emulador conectado
+.\gradlew.bat test
 ```
 
 ---
 
-## Testing
+## 🏗 Arquitectura
 
-Tests unitarios en `app/src/test/java/…`:
+Patrón **MVVM + Repository + reglas de dominio**. La capa `ai/` está desacoplada de la UI.
 
-| Categoría | Archivos |
-|---|---|
-| Mappers | `EmotionLabelsTest`, `EmotionalCheckInMapperTest`, `RecommendationHistoryMapperTest`, `ChatMessageMapperTest` |
-| Reglas / dominio | `RecommendationEngineTest`, `ProgressCalculatorTest` |
-| Seguridad IA | `RiskClassifierTest` |
-| Repositorios | `EmotionalRepositoryTest`, `ChatRepositoryTest` (con fakes DAO) |
-| ViewModels | `EmotionalCheckInViewModelTest`, `SupportChatViewModelTest` |
+```mermaid
+flowchart TB
+    subgraph UI["UI · Jetpack Compose"]
+        Screens[Pantallas]
+        VM[ViewModels]
+        Screens --> VM
+    end
 
-Herramientas clave:
+    subgraph Domain["Domain"]
+        Models[Modelos]
+        Rules[Motores y catálogos]
+        Mappers[Mappers]
+    end
 
-- `MainDispatcherRule` (en `app/src/test/…/MainDispatcherRule.kt`) — reemplaza `Dispatchers.Main` por un `UnconfinedTestDispatcher`.
-- `FakeEmotionalCheckInDao`, `FakeChatMessageDao` — implementaciones en memoria con `MutableStateFlow`.
-- `FakeSupportChatAi` — programable vía `nextResult`.
+    subgraph Data["Data"]
+        Room[(Room)]
+        Repo[Repositorios]
+        Repo --> Room
+    end
 
-Ejecutar: `./gradlew test` o desde Android Studio clic derecho sobre la carpeta `test`.
+    subgraph AI["AI"]
+        Risk[RiskClassifier]
+        Gemini[Gemini + Resilient]
+        Fallback[Fallback local]
+        Risk --> Gemini
+        Gemini --> Fallback
+    end
 
----
+    VM --> Repo
+    VM --> Rules
+    Repo --> Mappers
+    Rules --> Models
+    VM -.->|solo chat| AI
+```
 
-## Privacidad
+### Convenciones clave
 
-Diseño pensado para **uso personal**:
-
-- **Sin autenticación, sin cuentas, sin sincronización en la nube.**
-- **Sin backend propio.** No existe servidor al que se envíen datos personales.
-- **Almacenamiento 100% local** en la base Room del dispositivo (`AppDatabase`).
-- **Sin analytics ni crash reporting externos** en el MVP.
-- **Gemini API**: los mensajes del chat se envían a Google Generative AI **solo cuando el usuario escribe en el chat**. No se envían los chequeos emocionales ni el historial de recomendaciones. Revisar los [términos de Google AI](https://ai.google.dev/gemini-api/terms) para el tratamiento de datos.
-- **Mensaje de privacidad visible** al usuario en `PrivacyScreen` desde Home.
-- **Sin permisos sensibles** declarados en `AndroidManifest.xml`. Solo `INTERNET` para el chat IA.
-- **Safety layer**: `RiskClassifier` se ejecuta **antes** de enviar el texto a Gemini. En crisis, el mensaje no sale del dispositivo.
-
-Si más adelante se agrega exportación o sync, debe tratarse como cambio de alcance con aviso explícito al usuario.
-
----
-
-## Limitaciones del MVP
-
-- **Sin backup / export.** Si el usuario desinstala, pierde su historial. No hay export a CSV/JSON.
-- **Una sola sesión de chat activa a la vez** (`sessionId` generado en cada apertura). El historial por sesión se persiste pero no se navega entre sesiones archivadas.
-- **Sin notificaciones ni recordatorios.**
-- **Sin gráficos complejos** en Progress — solo barras de proporción con `LinearProgressIndicator` y listas.
-- **Idioma único**: español de Chile hardcodeado en los labels.
-- **Sin tests de UI ni de integración instrumentada**. Solo tests JVM.
-- **Gemini model fijo** (`gemini-1.5-flash-latest`). No hay selector de modelo.
-- **No hay rotación/expiración automática** de datos antiguos en la base Room.
-- **Sin modo accesibilidad avanzado** (TalkBack funciona pero no hay tamaños dinámicos extensos ni alto contraste explícito).
+- **Estado:** `MutableStateFlow` interno → `StateFlow` público de solo lectura  
+- **Eventos:** `sealed interface` por pantalla  
+- **Efectos one-shot:** `Channel` + `receiveAsFlow()` (navegación, snackbars)  
+- **Room solo desde repositorios** — los Composables no tocan DAOs  
+- **La UI no importa `ai/`** — el ViewModel traduce dominio ↔ turnos de chat  
 
 ---
 
-## Mejoras futuras
+## 📁 Estructura del proyecto
 
-Sugerencias priorizadas por valor / esfuerzo, listas para retomar:
+```
+app/src/main/java/cl/ipvg/docentecalma/
+├── ui/              Pantallas, tema, mascota, componentes
+├── navigation/      Rutas, NavHost, NavActions
+├── domain/          Modelos, mappers, reglas (RecommendationEngine, MicromoduleCatalog…)
+├── data/            Room, DataStore, repositorios, analytics piloto
+├── ai/              Gemini, fallback, clasificador de riesgo
+└── safety/          Seudónimo de instalación y eventos de riesgo locales
+```
 
-### Alto valor
+Pantallas principales: `home`, `emotionalcheckin`, `recommendations`, `micromodules`, `classroomguidance`, `quickexercises`, `supportchat`, `selfassessment`, `history`, `progress`, `privacy`, `pilotmetrics`, `onboarding`.
 
-1. **Export / import cifrado** del historial (JSON con passphrase) para que el docente no pierda datos al cambiar de dispositivo.
-2. **Recordatorios diarios opcionales** con `WorkManager` para sugerir un chequeo al comenzar/terminar la jornada.
-3. **Navegación entre sesiones de chat archivadas**; ya existen `ChatSessionSummary` y la query en `ChatMessageDao`.
-4. **Gráfico semanal/mensual de emociones** (considerar `vico-charts` o dibujo con Canvas Compose, manteniendo simplicidad).
-5. **Auto-purga configurable** (ej. "borrar chequeos > 12 meses") con una política en `domain/rules/`.
+## 📚 Documentación técnica
 
-### Calidad
-
-6. **Tests instrumentados** (Compose UI Test) para `HomeScreen`, `EmotionalCheckInScreen` y `SupportChatScreen`.
-7. **Migración a KMP** del módulo `domain/` si se plantea una versión iOS.
-8. **`proguard-rules.pro` endurecido** y `isMinifyEnabled = true` en release.
-9. **Crash reporting opt-in** (ej. Sentry con consentimiento explícito).
-10. **Migraciones Room** explícitas; hoy se confía en `fallbackToDestructiveMigration` durante desarrollo — revisar antes de producción.
-
-### Experiencia
-
-11. **Modo oscuro dinámico** (ya hay color scheme, validar contraste WCAG AA en todos los estados).
-12. **Strings extraídos a `strings.xml`** (hoy muchos están inline para agilidad del MVP) para facilitar i18n.
-13. **Selector de modelo Gemini** o soporte multi-proveedor (OpenAI, Claude) vía el mismo `SupportChatAi`.
-14. **Audio en ejercicios de respiración** (guía hablada para 4-7-8, grounding).
-15. **Widget Home Screen** con botón rápido "Chequeo emocional".
-
-### Seguridad IA
-
-16. **Ampliar `RiskClassifier`** con heurísticas adicionales (detección de patrones temporales, intensidad creciente).
-17. **Logging local opt-in** de respuestas marcadas como `fromFallback` para auditoría de calidad.
-18. **Revisión periódica del system prompt** según feedback de usuarios y guías de salud mental.
+Guía detallada de arquitectura, IA, persistencia y flujos → [`docs/TECHNICAL_OVERVIEW.md`](docs/TECHNICAL_OVERVIEW.md)
 
 ---
 
-## Licencia y contacto
+## 🛠 Stack tecnológico
 
-Proyecto académico/institucional. Consultar con el responsable del Instituto Profesional Virginio Gómez (IP Virginio Gómez) antes de redistribuir.
-#   a p p v g  
- 
+| Capa | Tecnología |
+|------|------------|
+| Lenguaje | Kotlin **2.0.21** |
+| UI | Jetpack Compose BOM **2024.10.01**, Material 3 |
+| Navegación | Navigation Compose **2.8.3** |
+| DI | Hilt **2.52** |
+| Persistencia | Room **2.6.1** · DataStore **1.1.1** · KSP |
+| IA | Google Generative AI **0.9.0** (Gemini) |
+| Build | AGP **8.7.2** · Gradle **9** |
+| Tests | JUnit 4 · `kotlinx-coroutines-test` |
+| SDK | `minSdk` **26** · `compileSdk` / `targetSdk` **35** |
+
+---
+
+## 🤖 Chat con Gemini (opcional)
+
+1. Crea una API key en [Google AI Studio](https://aistudio.google.com/app/apikey).  
+2. Añádela en `local.properties` como `GEMINI_API_KEY=...`  
+3. Recompila. Sin clave, el chat responde con **reglas locales** (`FallbackSupportChatAi`).
+
+Antes de llamar a Gemini, `RiskClassifier` intercepta mensajes de crisis (autolesión, daño a terceros, abuso) y responde con contención y líneas de emergencia **sin enviar el texto a la red**.
+
+---
+
+## 🔒 Privacidad
+
+| Aspecto | Comportamiento |
+|---------|----------------|
+| Cuentas | Sin login ni backend propio |
+| Datos | 100 % local (Room + DataStore) |
+| Chequeos / historial | No salen del dispositivo |
+| Chat IA | Solo los mensajes del chat van a Google cuando hay API key |
+| Permisos | Principalmente `INTERNET` para el chat |
+| Crisis | `RiskClassifier` actúa **antes** de cualquier llamada a Gemini |
+
+Detalle para el usuario final en la pantalla **Privacidad y datos** dentro de la app.
+
+---
+
+## 🧪 Tests
+
+```bash
+.\gradlew.bat test
+```
+
+Cobertura en mappers, reglas de dominio, `RiskClassifier`, repositorios (fakes) y ViewModels clave. Ver carpeta `app/src/test/`.
+
+---
+
+## 📸 Capturas
+
+<!-- Sustituye por imágenes reales cuando las tengas -->
+| Inicio | Chequeo emocional | Chat |
+|:------:|:-----------------:|:----:|
+| _pendiente_ | _pendiente_ | _pendiente_ |
+
+---
+
+## 🗺 Roadmap (resumen)
+
+<details>
+<summary><strong>Ver mejoras planificadas</strong></summary>
+
+- Export/import cifrado del historial  
+- Recordatorios opcionales con WorkManager  
+- Gráficos de emociones en el tiempo  
+- Tests de UI con Compose  
+- Strings centralizados en `strings.xml` para i18n  
+- Purga automática configurable de datos antiguos  
+
+</details>
+
+---
+
+## Licencia
+
+Proyecto **académico / institucional** del Instituto Profesional Virginio Gómez. Consultar antes de redistribuir.
+
+---
+
+<div align="center">
+
+**IP Virginio Gómez** · Docente Calma `v0.1.1`
+
+</div>
