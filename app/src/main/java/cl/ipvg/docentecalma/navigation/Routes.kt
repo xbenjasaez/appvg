@@ -43,6 +43,14 @@ sealed class Routes(val pattern: String) {
 
     data object QuickExercises : Routes("exercises")
 
+    data object BreathingWithVirgi : Routes("breathing_with_virgi")
+
+    data object TraceAndRelease : Routes("trace_and_release")
+
+    data object TranquilLight : Routes("tranquil_light")
+
+    data object CloudAndClarity : Routes("cloud_and_clarity")
+
     data object SupportChat : Routes("chat")
 
     data object History : Routes("history")

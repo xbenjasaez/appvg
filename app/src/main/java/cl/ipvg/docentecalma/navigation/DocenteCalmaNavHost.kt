@@ -15,6 +15,10 @@ import cl.ipvg.docentecalma.ui.screens.onboarding.OnboardingScreen
 import cl.ipvg.docentecalma.ui.screens.pilotmetrics.PilotMetricsScreen
 import cl.ipvg.docentecalma.ui.screens.privacy.PrivacyScreen
 import cl.ipvg.docentecalma.ui.screens.progress.ProgressScreen
+import cl.ipvg.docentecalma.ui.screens.breathingwithvirgi.BreathingWithVirgiScreen
+import cl.ipvg.docentecalma.ui.screens.traceandrelease.TraceAndReleaseScreen
+import cl.ipvg.docentecalma.ui.screens.cloudandclarity.CloudAndClarityScreen
+import cl.ipvg.docentecalma.ui.screens.tranquillight.TranquilLightScreen
 import cl.ipvg.docentecalma.ui.screens.quickexercises.QuickExercisesScreen
 import cl.ipvg.docentecalma.ui.screens.recommendations.RecommendationsScreen
 import cl.ipvg.docentecalma.ui.screens.selfassessment.SelfAssessmentNavActions
@@ -57,6 +61,10 @@ fun DocenteCalmaNavHost(navController: NavHostController) {
                     onNavigateToCheckIn = nav::toCheckIn,
                     onNavigateToClassroomGuidance = nav::toClassroomGuidance,
                     onNavigateToQuickExercises = nav::toQuickExercises,
+                    onNavigateToBreathingWithVirgi = nav::toBreathingWithVirgi,
+                    onNavigateToTraceAndRelease = nav::toTraceAndRelease,
+                    onNavigateToTranquilLight = nav::toTranquilLight,
+                    onNavigateToCloudAndClarity = nav::toCloudAndClarity,
                     onNavigateToSupportChat = nav::toSupportChat,
                     onNavigateToHistory = nav::toHistory,
                     onNavigateToProgress = nav::toProgress,
@@ -81,6 +89,7 @@ fun DocenteCalmaNavHost(navController: NavHostController) {
             RecommendationsScreen(
                 onBack = nav::back,
                 onOpenExercises = nav::toQuickExercises,
+                onOpenBreathingWithVirgi = nav::toBreathingWithVirgi,
                 onOpenChat = nav::toSupportChat,
                 onOpenMicromodule = nav::toMicromodule
             )
@@ -91,7 +100,26 @@ fun DocenteCalmaNavHost(navController: NavHostController) {
         }
 
         composable(Routes.QuickExercises.pattern) {
-            QuickExercisesScreen(onBack = nav::back)
+            QuickExercisesScreen(
+                onBack = nav::back,
+                onOpenBreathingWithVirgi = nav::toBreathingWithVirgi
+            )
+        }
+
+        composable(Routes.BreathingWithVirgi.pattern) {
+            BreathingWithVirgiScreen(onBack = nav::back)
+        }
+
+        composable(Routes.TraceAndRelease.pattern) {
+            TraceAndReleaseScreen(onBack = nav::back)
+        }
+
+        composable(Routes.TranquilLight.pattern) {
+            TranquilLightScreen(onBack = nav::back)
+        }
+
+        composable(Routes.CloudAndClarity.pattern) {
+            CloudAndClarityScreen(onBack = nav::back)
         }
 
         composable(Routes.Micromodules.pattern) {

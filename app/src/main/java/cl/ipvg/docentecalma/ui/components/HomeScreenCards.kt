@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,6 +38,7 @@ import cl.ipvg.docentecalma.domain.model.EmotionalCheckIn
 import cl.ipvg.docentecalma.ui.mascot.Mascot
 import cl.ipvg.docentecalma.ui.mascot.MascotEmotionMapper
 import cl.ipvg.docentecalma.ui.mascot.MascotPersona
+import cl.ipvg.docentecalma.ui.mascot.MascotState
 import cl.ipvg.docentecalma.util.DateTimeFormatters
 import cl.ipvg.docentecalma.ui.theme.IpvgBluePrimary
 import cl.ipvg.docentecalma.ui.theme.IpvgBlueVirginio
@@ -176,6 +178,116 @@ fun HomeEntryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun HomeGameCard(
+    title: String,
+    subtitle: String,
+    durationLabel: String,
+    mascotState: MascotState,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    accent: Color = IpvgBlueVirginio,
+    mascotContentDescription: String = "Mascota ${MascotPersona.NAME} invitando a jugar"
+) {
+    val shape = MaterialTheme.shapes.extraLarge
+
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(5.dp)
+                    .fillMaxHeight()
+                    .background(
+                        accent,
+                        RoundedCornerShape(topStart = 28.dp, bottomStart = 28.dp)
+                    )
+            )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 18.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(18.dp),
+                    color = accent.copy(alpha = 0.1f),
+                    tonalElevation = 0.dp
+                ) {
+                    Box(
+                        modifier = Modifier.padding(6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Mascot(
+                            state = mascotState,
+                            contentDescription = mascotContentDescription,
+                            sizeDp = 72.dp,
+                            animate = false
+                        )
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = accent.copy(alpha = 0.12f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = accent
+                            )
+                            Text(
+                                text = durationLabel,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = accent
+                            )
+                        }
+                    }
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     }

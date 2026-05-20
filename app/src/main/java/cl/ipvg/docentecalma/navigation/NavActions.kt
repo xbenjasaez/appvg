@@ -63,6 +63,30 @@ class NavActions(private val navController: NavHostController) {
         }
     }
 
+    fun toBreathingWithVirgi() {
+        navController.navigate(Routes.BreathingWithVirgi.pattern) {
+            launchSingleTop = true
+        }
+    }
+
+    fun toTraceAndRelease() {
+        navController.navigate(Routes.TraceAndRelease.pattern) {
+            launchSingleTop = true
+        }
+    }
+
+    fun toTranquilLight() {
+        navController.navigate(Routes.TranquilLight.pattern) {
+            launchSingleTop = true
+        }
+    }
+
+    fun toCloudAndClarity() {
+        navController.navigate(Routes.CloudAndClarity.pattern) {
+            launchSingleTop = true
+        }
+    }
+
     fun toSupportChat() {
         navController.navigate(Routes.SupportChat.pattern) {
             launchSingleTop = true

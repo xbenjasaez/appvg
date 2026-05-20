@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import cl.ipvg.docentecalma.domain.model.QuickExercise
 import cl.ipvg.docentecalma.domain.rules.QuickExerciseCatalog
 import cl.ipvg.docentecalma.ui.components.DocenteCalmaScaffold
+import cl.ipvg.docentecalma.ui.screens.breathingwithvirgi.BreathingCopy
 import cl.ipvg.docentecalma.ui.mascot.Mascot
 import cl.ipvg.docentecalma.ui.mascot.MascotPersona
 import cl.ipvg.docentecalma.ui.mascot.MascotResources
@@ -33,11 +36,15 @@ import cl.ipvg.docentecalma.ui.mascot.MascotState
  * pausa activa, reencuadre, micro descanso). Fuente única: [QuickExerciseCatalog].
  */
 @Composable
-fun QuickExercisesScreen(onBack: () -> Unit) {
+fun QuickExercisesScreen(
+    onBack: () -> Unit,
+    onOpenBreathingWithVirgi: () -> Unit
+) {
     DocenteCalmaScaffold(title = "Ejercicios breves", onBack = onBack) { padding ->
         QuickExercisesContent(
             padding = padding,
-            exercises = QuickExerciseCatalog.all
+            exercises = QuickExerciseCatalog.all,
+            onOpenBreathingWithVirgi = onOpenBreathingWithVirgi
         )
     }
 }
@@ -45,7 +52,8 @@ fun QuickExercisesScreen(onBack: () -> Unit) {
 @Composable
 private fun QuickExercisesContent(
     padding: PaddingValues,
-    exercises: List<QuickExercise>
+    exercises: List<QuickExercise>,
+    onOpenBreathingWithVirgi: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -55,8 +63,54 @@ private fun QuickExercisesContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item { Header() }
+        item {
+            RespiraConVirgiPromoCard(onOpen = onOpenBreathingWithVirgi)
+        }
         items(items = exercises, key = { it.id }) { exercise ->
-            ExerciseCard(exercise = exercise)
+            ExerciseCard(
+                exercise = exercise,
+                onOpenBreathingWithVirgi = onOpenBreathingWithVirgi
+            )
+        }
+    }
+}
+
+@Composable
+private fun RespiraConVirgiPromoCard(onOpen: () -> Unit) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Mascot(
+                    state = MascotState.Greeting,
+                    contentDescription = "Mascota ${MascotPersona.NAME} invitando a respirar",
+                    sizeDp = 64.dp,
+                    animate = false
+                )
+                Spacer(Modifier.widthIn(min = 12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = BreathingCopy.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = BreathingCopy.cardSubtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = onOpen,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(BreathingCopy.ctaStart)
+            }
         }
     }
 }
@@ -88,7 +142,10 @@ private fun Header() {
 }
 
 @Composable
-private fun ExerciseCard(exercise: QuickExercise) {
+private fun ExerciseCard(
+    exercise: QuickExercise,
+    onOpenBreathingWithVirgi: () -> Unit
+) {
     val mascotState = MascotResources.stateForExerciseId(exercise.id)
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -127,6 +184,15 @@ private fun ExerciseCard(exercise: QuickExercise) {
                 StepRow(index = index + 1, text = step)
                 if (index != exercise.steps.lastIndex) {
                     Spacer(Modifier.height(4.dp))
+                }
+            }
+            if (exercise.id == QuickExerciseCatalog.BREATHING_478.id) {
+                Spacer(Modifier.height(8.dp))
+                TextButton(
+                    onClick = onOpenBreathingWithVirgi,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(BreathingCopy.title)
                 }
             }
         }

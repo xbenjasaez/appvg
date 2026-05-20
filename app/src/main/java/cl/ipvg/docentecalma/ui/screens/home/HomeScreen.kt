@@ -48,13 +48,21 @@ import cl.ipvg.docentecalma.ui.components.BrandingHeader
 import cl.ipvg.docentecalma.ui.components.DocenteCalmaScaffold
 import cl.ipvg.docentecalma.ui.components.HomeEntryCard
 import cl.ipvg.docentecalma.ui.components.HomeEntryTier
+import cl.ipvg.docentecalma.ui.components.HomeGameCard
 import cl.ipvg.docentecalma.ui.components.HomeLatestCheckInCard
 import cl.ipvg.docentecalma.ui.components.HomeSectionHeader
+import cl.ipvg.docentecalma.ui.components.GamesCopy
+import cl.ipvg.docentecalma.ui.screens.breathingwithvirgi.BreathingCopy
+import cl.ipvg.docentecalma.ui.screens.traceandrelease.TraceAndReleaseCopy
+import cl.ipvg.docentecalma.ui.screens.cloudandclarity.CloudAndClarityCopy
+import cl.ipvg.docentecalma.ui.screens.tranquillight.TranquilLightCopy
 import cl.ipvg.docentecalma.ui.mascot.Mascot
 import cl.ipvg.docentecalma.ui.mascot.MascotPersona
 import cl.ipvg.docentecalma.ui.mascot.MascotState
 import cl.ipvg.docentecalma.ui.theme.IpvgBlueVirginio
+import cl.ipvg.docentecalma.ui.theme.IpvgGreen
 import cl.ipvg.docentecalma.ui.theme.IpvgOrange
+import cl.ipvg.docentecalma.ui.theme.IpvgBluePrimary
 import cl.ipvg.docentecalma.ui.theme.IpvgYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,6 +146,47 @@ fun HomeScreen(
                 tier = HomeEntryTier.PrimaryPortal,
                 accentOverride = IpvgOrange,
                 onClick = navActions.onNavigateToSupportChat
+            )
+
+            HomeSectionHeader(
+                title = GamesCopy.sectionTitle,
+                subtitle = GamesCopy.sectionSubtitle,
+                showDivider = true
+            )
+            HomeGameCard(
+                title = BreathingCopy.title,
+                subtitle = BreathingCopy.cardSubtitle,
+                durationLabel = BreathingCopy.estimatedDuration,
+                mascotState = MascotState.Greeting,
+                mascotContentDescription = "Mascota ${MascotPersona.NAME} invitando a respirar",
+                onClick = navActions.onNavigateToBreathingWithVirgi
+            )
+            HomeGameCard(
+                title = TraceAndReleaseCopy.title,
+                subtitle = TraceAndReleaseCopy.cardSubtitle,
+                durationLabel = TraceAndReleaseCopy.estimatedDuration,
+                mascotState = MascotState.EmotionCalm,
+                accent = IpvgGreen,
+                mascotContentDescription = "Mascota ${MascotPersona.NAME} invitando al camino de Virgi",
+                onClick = navActions.onNavigateToTraceAndRelease
+            )
+            HomeGameCard(
+                title = TranquilLightCopy.title,
+                subtitle = TranquilLightCopy.cardSubtitle,
+                durationLabel = TranquilLightCopy.estimatedDuration,
+                mascotState = MascotState.Idle,
+                accent = IpvgYellow,
+                mascotContentDescription = "Mascota ${MascotPersona.NAME} invitando a Luz tranquila",
+                onClick = navActions.onNavigateToTranquilLight
+            )
+            HomeGameCard(
+                title = CloudAndClarityCopy.title,
+                subtitle = CloudAndClarityCopy.cardSubtitle,
+                durationLabel = CloudAndClarityCopy.estimatedDuration,
+                mascotState = MascotState.Greeting,
+                accent = IpvgBluePrimary,
+                mascotContentDescription = "Mascota ${MascotPersona.NAME} invitando a Nube y claridad",
+                onClick = navActions.onNavigateToCloudAndClarity
             )
 
             HomeSectionHeader(

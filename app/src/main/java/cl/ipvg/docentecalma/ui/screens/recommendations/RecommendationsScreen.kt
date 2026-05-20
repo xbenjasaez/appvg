@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -31,7 +32,9 @@ import cl.ipvg.docentecalma.domain.mapper.displayName
 import cl.ipvg.docentecalma.domain.model.Recommendation
 import cl.ipvg.docentecalma.domain.model.SeverityFlag
 import cl.ipvg.docentecalma.domain.rules.MicromoduleCatalog
+import cl.ipvg.docentecalma.domain.rules.QuickExerciseCatalog
 import cl.ipvg.docentecalma.ui.components.DocenteCalmaScaffold
+import cl.ipvg.docentecalma.ui.screens.breathingwithvirgi.BreathingCopy
 import cl.ipvg.docentecalma.ui.mascot.MascotEmptyState
 import cl.ipvg.docentecalma.ui.mascot.MascotPersona
 import cl.ipvg.docentecalma.ui.mascot.MascotState
@@ -40,6 +43,7 @@ import cl.ipvg.docentecalma.ui.mascot.MascotState
 fun RecommendationsScreen(
     onBack: () -> Unit,
     onOpenExercises: () -> Unit,
+    onOpenBreathingWithVirgi: () -> Unit,
     onOpenChat: () -> Unit,
     onOpenMicromodule: (String) -> Unit,
     viewModel: RecommendationsViewModel = hiltViewModel()
@@ -61,6 +65,7 @@ fun RecommendationsScreen(
                 acknowledged = state.acknowledged,
                 onAcknowledge = { viewModel.onEvent(RecommendationsEvent.OnAcknowledge) },
                 onOpenExercises = onOpenExercises,
+                onOpenBreathingWithVirgi = onOpenBreathingWithVirgi,
                 onOpenChat = onOpenChat,
                 onOpenMicromodule = onOpenMicromodule
             )
@@ -76,6 +81,7 @@ private fun ContentState(
     acknowledged: Boolean,
     onAcknowledge: () -> Unit,
     onOpenExercises: () -> Unit,
+    onOpenBreathingWithVirgi: () -> Unit,
     onOpenChat: () -> Unit,
     onOpenMicromodule: (String) -> Unit
 ) {
@@ -169,6 +175,17 @@ private fun ContentState(
         Spacer(modifier = Modifier.height(4.dp))
 
         if (recommendation.suggestedExercise != null) {
+            val isBreathingExercise =
+                recommendation.suggestedExercise.id == QuickExerciseCatalog.BREATHING_478.id
+            if (isBreathingExercise) {
+                FilledTonalButton(
+                    onClick = onOpenBreathingWithVirgi,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(BreathingCopy.title)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             OutlinedButton(
                 onClick = onOpenExercises,
                 modifier = Modifier.fillMaxWidth()
